@@ -1,0 +1,18 @@
+services:
+  # nginx web server service
+  nginx:
+    build:
+      context: ./nginx
+    container_name: f5-nginx
+    ports:
+      # map host ports to container ports for testing from my machine
+      - "8080:8080"
+      - "8081:8081"
+
+  # test runner service
+  test:
+    build:
+      context: ./tests
+    container_name: f5-test
+    depends_on:
+      - nginx
