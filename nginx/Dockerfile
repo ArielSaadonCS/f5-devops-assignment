@@ -1,22 +1,20 @@
-FROM ubuntu:20.04 
+# Use an official Nginx image
+FROM nginx:alpine
 
-# disable interactive prompts during apt installs
-ENV DEBIAN_FRONTEND=noninteractive
+# Install openssl
+RUN apk add --no-cache openssl
 
-# install nginx with minimal recommended packages 
-RUN apt-get update \
-&& apt-get install -y --no-install-recommends nginx \
-#remove lists downloaded by apt-get-update(for faster image)
-&& rm -rf /var/lib/apt/lists/*
+# Create a self-signed SSL certificate
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/nginx-selfsigned.key \
+    -out /etc/ssl/certs/nginx-selfsigned.crt \
+    -subj "/C=US/ST=State/L=Location/O=Organization/OU=Unit/CN=yourdomain.com"
 
-#remove the default ngninx site config to avoid conflicts
-RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
+# Copy the default Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-#copy the custom nginx configuration
-COPY nginx.conf etc/nginx/conf.d/f5assignment.conf
+# Expose port 443
+EXPOSE 443
 
-# document the ports this container will listen on
-EXPOSE 8080 8081
-
-#run nginx in foreground so the container keeps running
-CMD ["nginx" , "-g" , "daemon off;"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
