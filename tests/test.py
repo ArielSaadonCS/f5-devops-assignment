@@ -3,7 +3,6 @@ import time
 import urllib.request
 import urllib.error
 
-# In docker-compose, we will call the nginx service "nginx"
 NGINX_HOST = "nginx"
 
 OK_URL = f"http://{NGINX_HOST}:8080/"
@@ -17,15 +16,15 @@ def http_get(url, timeout=2):
             body = resp.read().decode("utf-8", errors="replace")
             return resp.status, body
     except urllib.error.HTTPError as e:
-        # HTTPError happens for non-2xx codes (e.g., 418)
+        # HTTPError happens for non-2xx codes 
         body = e.read().decode("utf-8", errors="replace") if e.fp else ""
         return e.code, body
     except Exception as e:
-        # Network errors, DNS errors, connection refused, etc.
+        # Network errors, DNS errors, connection refused and more...
         return None, str(e)
 
 def wait_until_up(url, attempts=30, delay=1.0):
-    """Retry until the service is reachable (simple readiness check)."""
+    """retry until the service is reachable"""
     for _ in range(attempts):
         status, _ = http_get(url)
         if status is not None:
