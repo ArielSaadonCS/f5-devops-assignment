@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 #download/update available packges from Ubuntu for installtion
 RUN apt-get update \
-#install web server
+
 && apt-get install -y --no-install-recommends nginx \
 #remove lists downloaded by apt-get-update(for faster image)
 && rm -rf /var/lib/apt/lists/*
