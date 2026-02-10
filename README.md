@@ -1,7 +1,7 @@
 # F5 DevOps Intern Home Assignment
 
 ## Overview
-This project implements a small containerized web stack and automated tests using Docker and Docker Compose.
+This project implements a containerized web stack and automated tests using Docker and Docker Compose.
 
 It includes:
 - An **Nginx container** that exposes two endpoints:
@@ -16,10 +16,10 @@ It includes:
 ## Design Decisions
 
 - **Separate containers for app and tests**  
-  Tests run in their own container to keep the web server image clean and production-like.
+  Tests run in their own container to keep the web server image clean.
 
 - **Docker Compose for orchestration**  
-  Compose provides built-in networking and DNS between services, allowing the test container to reach the nginx container using the service name (`nginx`).
+  Compose provides built in networking and DNS between services, allowing the test container to reach the nginx container using the service name (`nginx`).
 
 - **Python standard library (urllib)**  
   Used instead of external libraries to avoid extra dependencies and keep the test image small.
@@ -33,7 +33,7 @@ It includes:
 
 - The nginx service becomes reachable within a short time window — handled with retry logic.
 - Only two endpoints are required by the assignment.
-- No TLS/HTTPS is required for this task.
+- No TLS/HTTPS is required for the first part.
 
 ---
 
@@ -50,14 +50,14 @@ It includes:
 Steps taken to reduce image size:
 - Used `--no-install-recommends` in apt installs
 - Removed apt package lists after install
-- Used Alpine-based Python image for tests
-- Avoided extra Python dependencies
+- Used Alpine based python image for tests
+- Avoided extra python dependencies
 
 ---
-## Advanced Configuration (Optional)
+## Advanced Configuration
 
 ### HTTPS Support
-The project supports HTTPS on port **8443**. A self-signed certificate is automatically generated during the Docker build process using OpenSSL.
+The project supports HTTPS on port **8443**. A self signed certificate is automatically generated during the Docker build process using OpenSSL.
 
 ### Rate Limiting Configuration
 Rate limiting is enabled to prevent abuse.
