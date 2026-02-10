@@ -3,6 +3,14 @@ import time
 import urllib.request
 import urllib.error
 
+"""
+Integration test script for nginx container.
+
+Design notes:
+- Uses only Python standard library to avoid extra dependencies.
+- Returns proper exit codes so CI can detect failures.
+"""
+
 NGINX_HOST = "nginx"
 
 OK_URL = f"http://{NGINX_HOST}:8080/"
