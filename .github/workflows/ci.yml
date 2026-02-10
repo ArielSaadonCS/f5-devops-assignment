@@ -1,4 +1,4 @@
-name: CI  # workflow name 
+name: Docker Compose Integration Tests
 
 on:
   push:          # run on every push
