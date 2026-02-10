@@ -1,22 +1,27 @@
-FROM ubuntu:20.04 
+FROM ubuntu:20.04
 
-# disable interactive prompts during apt installs
+# Disable interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# install nginx with minimal recommended packages 
-RUN apt-get update \
-&& apt-get install -y --no-install-recommends nginx \
-#remove lists downloaded by apt-get-update(for faster image)
-&& rm -rf /var/lib/apt/lists/*
+# Install Nginx and OpenSSL
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nginx openssl && \
+    rm -rf /var/lib/apt/lists/*
 
-#remove the default ngninx site config to avoid conflicts
-RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
+# Generate self-signed SSL certificate
+RUN mkdir -p /etc/nginx/certs && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/nginx/certs/selfsigned.key \
+    -out /etc/nginx/certs/selfsigned.crt \
+    -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
-#copy the custom nginx configuration
-COPY nginx.conf etc/nginx/conf.d/f5assignment.conf
+# Remove default config
+RUN rm -f /etc/nginx/sites-enabled/default
 
-# document the ports this container will listen on
-EXPOSE 8080 8081
+# Copy custom config
+COPY nginx.conf /etc/nginx/conf.d/f5assignment.conf
 
-#run nginx in foreground so the container keeps running
-CMD ["nginx" , "-g" , "daemon off;"]
+# Expose HTTP and HTTPS ports
+EXPOSE 8080 8081 8443
+
+CMD ["nginx", "-g", "daemon off;"]

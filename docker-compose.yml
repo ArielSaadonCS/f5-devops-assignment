@@ -1,15 +1,16 @@
+# Docker Compose configuration for Nginx and test containers
 services:
-  # nginx web server service
+# Nginx service
   nginx:
     build:
       context: ./nginx
     container_name: f5-nginx
     ports:
-      # map host ports to container ports for testing from my machine
       - "8080:8080"
       - "8081:8081"
+      - "8443:8443"
 
-  # test runner service
+  # Test service
   test:
     build:
       context: ./tests

@@ -54,6 +54,27 @@ Steps taken to reduce image size:
 - Avoided extra Python dependencies
 
 ---
+## Advanced Configuration (Optional)
+
+### HTTPS Support
+The project supports HTTPS on port **8443**. A self-signed certificate is automatically generated during the Docker build process using OpenSSL.
+
+### Rate Limiting Configuration
+Rate limiting is enabled to prevent abuse.
+
+* **How it works:**
+  Nginx uses the `limit_req_zone` directive to track requests per IP address.
+  - **Rate:** 5 requests per second (`5r/s`).
+  - **Burst:** A buffer of 5 requests (`burst=5`) allows for small traffic spikes.
+  - **Behavior:** Requests exceeding the rate + burst buffer are rejected with HTTP 503.
+
+* **How to change the rate limit threshold:**
+  1. Open `nginx/nginx.conf`.
+  2. Modify the `rate` value in: `limit_req_zone $binary_remote_addr zone=mylimit:10m rate=5r/s;`.
+  3. Modify the `burst` value in the `location /` blocks if needed.
+  4. Rebuild the container: `docker compose up --build`.
+  
+  ---
 
 ## How to Build and Run Locally
 
