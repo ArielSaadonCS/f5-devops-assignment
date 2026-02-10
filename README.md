@@ -14,18 +14,33 @@ It includes:
 ---
 
 ## Design Decisions
-
-- **Separate containers for app and tests**  
-  Tests run in their own container to keep the web server image clean.
-
-- **Docker Compose for orchestration**  
-  Compose provides built in networking and DNS between services, allowing the test container to reach the nginx container using the service name (`nginx`).
+  
+- **Modular Project Structure**
+  Separated configuration and Dockerfiles into dedicated directories (`nginx/`, `tests/`) to maintain a clean root directory and separate concerns effectively.
+  
+- **Minimal Attack Surface & Optimization**
+  Used `--no-install-recommends` and cleaned up apt lists in the Dockerfile. This reduces the image size and minimizes potential security vulnerabilities by excluding unnecessary packages.
 
 - **Python standard library (urllib)**  
   Used instead of external libraries to avoid extra dependencies and keep the test image small.
 
 - **Explicit exit codes in tests**  
   Tests return exit code 0 on success and non-zero on failure so CI can fail correctly.
+  
+- **"Burst" Strategy for Rate Limiting**
+  Strictly enforcing 5 requests/second can harm user experience in real-world scenarios. I configured Nginx with `burst=5 nodelay`, which strictly enforces the average rate but allows for small, traffic spikes without immediate rejection.
+
+- **Minimalist Test Image (Alpine)**
+  Chose python:3.12-alpine to keep the test image lightweight and speed up CI pulls/builds.
+
+- **Resiliency / Retry Logic**
+  Implemented a custom retry mechanism (`wait_until_up`) within the test script. Since Docker Compose starts containers simultaneously, this logic ensures the tests strictly wait for Nginx to be fully ready before execution, preventing flaky failures due to race conditions.
+
+- **Fail-Fast CI Pipeline**
+   configured the CI to use `docker compose up --abort-on-container-exit`. This ensures that as soon as the tests complete, the environment creates a teardown event, saving CI resources and providing quicker feedback loops.
+  
+- **Self-Contained SSL Generation**
+  Generated a self-signed certificate during build for the assignment, to keep the project self contained. In production, certificates would be provided via a proper CA and secret management.
 
 ---
 
