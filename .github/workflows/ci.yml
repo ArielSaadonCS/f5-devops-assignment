@@ -1,5 +1,5 @@
 name: Docker Compose Integration Tests
-
+run-name: Compose tests for ${{ github.ref_name }} by @${{ github.actor }}
 on:
   push:          # run on every push
   pull_request:  # run on every pull request
